@@ -39,6 +39,10 @@
                     <button string="Validate" type="object" name="button_validate"
                             attrs="{'invisible': [('state', '!=', 'draft')]}"
                             groups="freight_route.freight_route_group_manager"/>
+                    <button string="Create delivery" type="object" name="create_delivery"
+                            attrs="{'invisible': ['|',('state', 'in', ('draft', 'cancel')),('type', '!=', 'carry')]}"
+                            groups="freight_route.freight_route_group_manager"
+                    />
 
                     <!--Status bar-->
                     <field name="state" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}"
@@ -71,30 +75,36 @@
                             <field name="customer_id" widget="res_partner_many2one"
                                    domain="[('parent_id','=',False)]"
                                    context="{'show_address': 1}"
-                                   options="{'always_reload': True, 'no_quick_create': True}"
+                                   options="{'no_quick_create': True}"
                                    attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="manager_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="manager_id"
+                                   options="{'no_create': True}"
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                         </group>
                         <group name="group_payment" string="Payment">
                             <field name="payment_method" attrs="{'readonly' : [('state','!=','draft')]}"/>
-                            <field name="freight" widget="monetary" attrs="{'readonly' : [('state','!=','draft')]}"/>
-                            <field name="insurance" widget="monetary" attrs="{'readonly' : [('state','!=','draft')]}"/>
-                            <field name="others" widget="monetary" attrs="{'readonly' : [('state','!=','draft')]}"/>
-                            <field name="total" widget="monetary" attrs="{'readonly' : [('state','!=','draft')]}"/>
+                            <field name="freight_value" widget="monetary"
+                                   attrs="{'readonly' : [('state','!=','draft')]}"/>
+                            <field name="insurance_value" widget="monetary"
+                                   attrs="{'readonly' : [('state','!=','draft')]}"/>
+                            <field name="others_value" widget="monetary"
+                                   attrs="{'readonly' : [('state','!=','draft')]}"/>
+                            <field name="total_value" widget="monetary"
+                                   attrs="{'readonly' : [('state','!=','draft')]}"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
                         <group name="group_carry" string="Carry">
                             <field name="carry_id" widget="res_partner_many2one"
-                                   domain="[('type','=','delivery')]"
+                                   domain="[('type','in',('contact','delivery','other'))]"
                                    context="{'show_address': 1}"
-                                   options="{'always_reload': True, 'no_quick_create': True}"
+                                   options="{'no_quick_create': True}"
                                    attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                         </group>
                         <group name="group_recipient" string="Recipient">
                             <field name="recipient_id" widget="res_partner_many2one"
                                    domain="[('type','=','delivery')]"
-                                   context="{'show_address': 1}"
-                                   options="{'always_reload': True}"
+                                   context="{'default_type': 'delivery', 'show_address': 1}"
+                                   options="{'no_quick_create': True}"
                                    attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                         </group>
                         <group name="group_merchant" string="Merchant">
@@ -108,8 +118,8 @@
                                    attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="driver_id" widget="res_partner_many2one"
                                    domain="[('is_driver', '=', True)]"
-                                   context="{'show_address': 1}"
-                                   options="{'always_reload': True}"
+                                   context="{'default_is_driver': True, 'show_address': 1}"
+                                   options="{'no_quick_create': True}"
                                    attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                         </group>
                         <notebook colspan="2">
